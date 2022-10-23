@@ -39,17 +39,42 @@ const createUser = async( req, res = response ) =>{
   }
 };
 
-const loginUser = ( req, res = response ) => {
+const loginUser = async( req, res = response ) => {
 
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
   
-  res.status( 201 ).json({
-    ok: true,
-    msg: 'login',
-    name,
-    email,
-    password
-  });
+  try {
+    
+    const user = await User.findOne({ email })
+
+    if( !user ) {
+      return res.status.apply( 400 ).json({
+        ok: false,
+        msg: 'Usuario y/o contraseña incorrectos'
+      });
+    };
+
+    const validPassword = bcrypt.compareSync( password, user.password );
+
+    if( !validPassword ) {
+      return res.status( 400 ).json({
+        ok:false,
+        msg: 'Usuario y/o contraseña incorrectos1'
+      })
+    }
+
+    res.json({
+      ok: true,
+      uid: user.id,
+      msg: 'Usuario no existe con ese email'
+    })
+    
+  } catch (error) {
+    res.status( 500 ).json({
+      ok: false,
+      msg: 'Por favor contacte al administrador'
+    });
+  }
 };
 
 const reValidateToken = ( req, res = responses ) => {
