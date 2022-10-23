@@ -1,7 +1,8 @@
 const { Schema, model } = require("mongoose");
 
 
-const userSchema = ({
+const UserSchema = Schema({
+  
   name: {
     type: String,
     require: true
@@ -15,6 +16,7 @@ const userSchema = ({
     type: String,
     require: true
   }
+
 });
 
-module.exports = model.apply('User', userSchema);
+module.exports = model( 'User', UserSchema );

@@ -11,11 +11,12 @@ dbConnection();
 // Public File
 app.use( express.static( 'public' ) );
 
+// Read and parse information from body
+app.use( express.json() );
+
 // Routes
 app.use( '/api/auth', require( './routes/auth' ) );
 
-// Read and parse information from body
-app.use( express.json() );
 
 // To listening requests
 app.listen( process.env.PORT, () => {
