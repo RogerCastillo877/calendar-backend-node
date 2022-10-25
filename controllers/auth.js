@@ -1,6 +1,7 @@
 const { response } = require( 'express' );
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const { generateJWT } = require('../helpers/jwt');
 
 const createUser = async( req, res = response ) =>{
 
@@ -23,12 +24,15 @@ const createUser = async( req, res = response ) =>{
     user.password = bcrypt.hashSync( password, salt );
   
     await user.save();
+    
+    const token = await generateJWT( user.id, user.name );
   
     res.status( 201 ).json( {
       ok: true,
       msg: 'register',
       uid: email,
-      name: user.name
+      name: user.name,
+      token
     });
 
   } catch (error) {
@@ -63,10 +67,13 @@ const loginUser = async( req, res = response ) => {
       })
     }
 
+    const token = await generateJWT( user.id, user.name );
+
     res.json({
       ok: true,
       uid: user.id,
-      msg: 'Usuario no existe con ese email'
+      msg: 'Usuario ya existe con ese email',
+      token
     })
     
   } catch (error) {
