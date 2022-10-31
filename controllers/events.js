@@ -38,14 +38,14 @@ const createEvent = async( req, res = response ) => {
 const updateEvent = async( req, res = response) => {
 
   const eventId = req.params.id;
+  const uid = req.uid;
   
   try {
 
     const event = await Event.findById( eventId );
-    const uid = req.uid;
 
     if( !event ) {
-      res.status( 404 ).json({
+      return res.status( 404 ).json({
         ok: false,
         msg: "No existe por ese id"
       })
@@ -68,7 +68,7 @@ const updateEvent = async( req, res = response) => {
     res.json({
       ok: true,
       event: updatedEvent
-    })
+    });
     
   } catch (error) {
     console.log(error);
@@ -79,12 +79,43 @@ const updateEvent = async( req, res = response) => {
   }
 };
 
-const deleteteEvent = ( req, res = response) => {
+const deleteteEvent = async( req, res = response) => {
 
-  res.json({
-    ok: true,
-    msg: 'deleteEvents'
-  });
+  const eventId = req.params.id;
+  const uid = req.uid;
+  
+  try {
+
+    const event = await Event.findById( eventId );
+
+    if( !event ) {
+      return res.status( 404 ).json({
+        ok: false,
+        msg: "No existe por ese id"
+      })
+    };
+
+    if( event.user.toString() !== uid ) {
+       return res.status( 401 ).json({
+        ok: false,
+        msg: "No tiene privilegio de eliminar el evento"
+      });
+    };
+
+    await Event.findByIdAndDelete( eventId );
+
+    res.json({
+      ok: true,
+      msg: "Evento eliminado"
+    });
+    
+  } catch (error) {
+    console.log(error);
+    res.status( 500 ).json({
+      ok: false,
+      msg: "Contacte al administrador"
+    });  
+  };
 };
 
 module.exports = { getEvents, createEvent, updateEvent, deleteteEvent };
