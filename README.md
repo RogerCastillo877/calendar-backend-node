@@ -113,3 +113,5 @@ npm i jsonwebtoken
 ```
 npm i cors
 ```
+
+## Deploy in Railway [https://railway.app/]
